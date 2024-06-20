@@ -1,0 +1,7 @@
+nimble.develop
+nimble.paths
+
+out/
+bin/
+lib/
+.godot/
