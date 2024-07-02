@@ -23,6 +23,7 @@ import operators/builtinclasses/operators
 import operators/builtinclasses/methods
 import operators/classindex
 import operators/classes/methods
+import operators/classes/properties
 import operators/classes/vmap
 
 import std/json
@@ -134,6 +135,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
                 weave Margin(thickness: 1):
                   for entry in class.json.methods.get(@[]):
                     weave entry.convert(sym)
+                weave_properties class
                 weave_vmap(class)
 
     weave config.project.nimble:
