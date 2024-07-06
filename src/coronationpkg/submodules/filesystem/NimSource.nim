@@ -33,16 +33,16 @@ proc nim*(moduleName: string): NimSource =
     pContents: cloth multiline,
   )
 
-proc dummy*(source: NimSource): lent NimSource =
+proc dummy*(source: NimSource): NimSource =
   source.metadata.flags.incl Dummy
   source
 
-proc `import`*(source: NimSource; targets: varargs[NimSource]): lent NimSource =
+proc `import`*(source: NimSource; targets: varargs[NimSource]): NimSource =
   for target in targets:
     source.imports.incl target
   source
 
-proc `export`*(source: NimSource; targets: varargs[NimSource]): lent NimSource =
+proc `export`*(source: NimSource; targets: varargs[NimSource]): NimSource =
   for target in targets:
     source.exports.incl target
   source
@@ -61,7 +61,7 @@ proc weave_imports(source: NimSource): Cloth =
     for target in source.imports:
       source.makeImportSentence(target, true, target in source.exports)
 
-macro weave*(source: NimSource; body): lent NimSource =
+macro weave*(source: NimSource; body): NimSource =
   let src = gensym(nskLet, "src")
   quote do:
     let `src`: NimSource = `source`
