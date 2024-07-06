@@ -5,16 +5,14 @@ godot-nim/coronation provides a generator that generates any version of the GDEx
 ## Quick Start
 
 ```console
-coronation$ nimble run
-coronation$ cd out/godot410
-coronation/out/godot410$ nimble install # (or, nimble develop)
-coronation/out/godot410$ cd -
-coronation$ nimble install https://github.com/godot-nim/godotcore
+coronation$ ./install.sh
 coronation$ cd tests
 coronation/tests$ nim c src/test
 coronation/tests$ file lib/libtest.so
 coronation/tests$ godot --editor
 ```
+[install.sh](https://github.com/godot-nim/coronation/blob/main/install.sh) is a simple script that sets up godot package.
+This function will be moved to [minister](https://github.com/godot-nim/minister) soon.
 
 ## Requires
 

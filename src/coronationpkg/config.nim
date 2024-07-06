@@ -2,35 +2,10 @@ import std/tables
 
 import submodules/semanticstrings
 
-const AutoDetect* = "%AutoDetect%"
-type BuildConfigResolveError = object of CatchableError
-
 type BuildConfig* {.requiresinit.} = object
-  outdir*: string = AutoDetect
-  project*: string = AutoDetect
+  outdir*: string
   apisource*: string
-
-proc resolve*(conf: BuildConfig): BuildConfig =
-  BuildConfig(
-    outdir: case conf.outdir:
-    of AutoDetect:
-      "out/godot410"
-    else:
-      conf.outdir
-    ,
-    project: case conf.project:
-    of AutoDetect:
-      "godot"
-    else:
-      conf.project
-    ,
-    apisource: case conf.apisource:
-    of AutoDetect:
-      raise newException(BuildConfigResolveError, "`apisource` MUST be specified.")
-    else:
-      conf.apisource
-  )
-
+  package*: string
 
 type
   IgnoreConf* = object

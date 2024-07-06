@@ -58,7 +58,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
   # Apply above definitions physical with `generate`.
   layout config.outdir.root:
     layout "src".dir:
-      layout config.project.nim
+      layout config.package.nim
           .import(godotcore).export(godotcore):
 
         # [Global Enums]
@@ -138,7 +138,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
                 weave_properties class
                 weave_vmap(class)
 
-    weave config.project.nimble:
+    weave config.package.nimble:
       "# Package"
       ""
       "version       = \"4.1.0\""
@@ -156,7 +156,6 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
 
 
 proc run*(config: BuildConfig) =
-  let config = resolve config
   let api = parseFile(config.apisource).to(JsonAPI)
 
   for class in api.classes:
