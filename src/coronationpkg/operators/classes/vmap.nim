@@ -19,7 +19,7 @@ proc weave_vmap*(class: Class): Cloth = weave multiline:
       "  toTable {"
     else:
       &"  {class.inherits}_vmap.concat" & " toTable {"
-    weave indent(4):
+    weave Indent(level: 4):
       for entry in vmethods:
         "\"" & $entry.name.scan.convert(ProcSym) & "\" : \"" & $entry.name & "\","
       "}"

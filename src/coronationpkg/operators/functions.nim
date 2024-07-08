@@ -47,7 +47,7 @@ proc weave*(procKey: ProcKey): Cloth =
     head &= " " & $procKey.pragmas
 
   head &= " ="
-  return head
+  result = clothfy head
 
 proc gen_containerKey*(prockey: ProcKey): ContainerKey =
   ## FORMAT: SELFTYPE_PROCNAME(_ARGS..)
@@ -59,7 +59,7 @@ proc gen_containerKey*(prockey: ProcKey): ContainerKey =
   text.add ($prockey.name).replace("`", "")
   if prockey.self == nil:
     for arg in prockey.args:
-      if arg.typesym in [TypeSym.Void]: continue
-      text.add " "
-      text.add $arg.typesym
+      if arg.typesym notin [TypeSym.Void]:
+        text.add " "
+        text.add $arg.typesym
   ContainerKey "`" & text & "`"

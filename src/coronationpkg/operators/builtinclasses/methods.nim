@@ -24,12 +24,12 @@ proc extract_result(self: JsonBuiltinClassMethod): RenderableResult =
 proc specify(arg: RenderableArgument): RenderableArgument =
   if arg.typeSym == TypeSym"Object":
     arg.typeSym = TypeSym.GodotClass
-  return arg
+  arg
 
 proc specify(arg: RenderableResult): RenderableResult =
   if arg.typeSym == TypeSym"Object":
     arg.typeSym = TypeSym.GodotClass
-  return arg
+  arg
 
 proc extract_args(self: JsonBuiltinClassMethod): seq[RenderableArgument] =
   result = self.arguments.get(@[])
@@ -81,7 +81,7 @@ proc weave_procdef*(entry: BuiltinClassMethodEntry): Cloth =
 
   weave multiline:
     weave ProcKey entry
-    weave indent2:
+    weave Indent.indent:
       if entry.args.len != 0:
         &"let argArr = [" & entry.args.mapIt(&"getPtr {it.name}").join(", ") & "]"
       &"{entry.containerKey}({p_self}, {p_args}, {p_result}, {entry.args.len})"
@@ -112,7 +112,7 @@ proc weave_methods*(json: JsonBuiltinClass): Cloth =
 
       weave multiline:
         &"process eventindex.init_engine.on_load_builtinclassMethod:"
-        weave indent2:
+        weave Indent.indent:
           "var proc_name: StringName"
           for entry in methods:
             weave_loadstmt entry

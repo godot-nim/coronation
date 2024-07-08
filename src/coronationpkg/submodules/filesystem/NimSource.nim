@@ -103,6 +103,6 @@ method dumpTree(source: NimSource): Cloth =
       source.name & source.ext
     else:
       source.name & source.ext & "/"
-      weave Tree():
+      weave tree:
         for key, subitem in source.subitems:
           dumpTree subitem

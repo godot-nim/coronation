@@ -9,7 +9,7 @@ type
     list*: seq[string]
 
 func `$`*(pragmas: Pragmas): string =
-  if pragmas.list.len == 0: return
+  if pragmas.list.len == 0: result
   else:
     "{." & pragmas.list.join(", ") & ".}"
 

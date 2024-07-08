@@ -14,6 +14,6 @@ method generate(directory: VirtualDirectory) =
 method dumpTree(directory: VirtualDirectory): Cloth =
   weave multiline:
     directory.name & "/"
-    weave Tree():
+    weave tree:
       for key, subitem in directory.subitems:
         dumpTree subitem

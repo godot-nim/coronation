@@ -127,18 +127,24 @@ proc weave_operators*(json: JsonBuiltinClass): Cloth =
     weave multiline:
       for op in operators:
         if ignore.operator:
-          if op.containerkey notin ignore.operator_white: continue
-        weave_container op
+          if op.containerkey in ignore.operator_white:
+            weave_container op
+        else:
+          weave_container op
     weave multiline:
       for op in operators:
         if ignore.operator:
-          if op.containerkey notin ignore.operator_white: continue
-        weave_procdef op
+          if op.containerkey in ignore.operator_white:
+            weave_procdef op
+        else:
+          weave_procdef op
 
     weave transact:
       &"process eventindex.init_engine.on_load_builtinclassOperator:"
-      weave Proof(elements: 1) & indent2:
+      weave Proof(elements: 1) & Indent.indent:
         for op in operators:
           if ignore.operator:
-            if op.containerkey notin ignore.operator_white: continue
-          weave_loadstmt op
+            if op.containerkey in ignore.operator_white:
+              weave_loadstmt op
+          else:
+            weave_loadstmt op

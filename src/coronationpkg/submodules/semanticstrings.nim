@@ -62,17 +62,19 @@ const keywords* = [
 ]
 proc escapeVariable*(w: string): string =
   if w in keywords:
-    return quoted w
-  for c in w:
-    if c notin 'a'..'z' and c notin 'A'..'Z' and c notin '0'..'9':
-      return quoted w
-  return w
+    result = quoted w
+  else:
+    result = w
+    for c in w:
+      if c notin 'a'..'z' and c notin 'A'..'Z' and c notin '0'..'9':
+        result = quoted w
+        break
 
 proc convert*(ss: WordRope; _: typedesc[TypeSym]): TypeSym =
   var str = newStringOfCap(ss.total)
   for i, w in ss.words:
     case string(w)
-    of "t": continue
+    of "t": discard
     of ".": str.add "_"
     of "double": str.add "float64"
     else: str.add w.pascal

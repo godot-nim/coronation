@@ -41,20 +41,18 @@ proc item(sym: TypeSym): TypeSym =
 
 proc weave_subscript*(json: JsonBuiltinClass): Cloth =
   let typename = json.name.scan.convert(TypeSym)
-  case json.subscription(typename)
-  of Never: return
-  of Optimize:
-    weave multiline:
+  weave multiline:
+    case json.subscription(typename)
+    of Never: discard
+    of Optimize:
       &"proc `[]`*(self: {typename}; index: int): {typename.item} = self.data_unsafe[index]"
       &"proc `[]`*(self: var {typename}; index: int): var {typename.item} = self.data_unsafe[index]"
       &"proc `[]=`*(self: var {typename}; index: int; value: {typename.item}) = self.data_unsafe[index] = value"
-  of Indexing:
-    weave multiline:
+    of Indexing:
       &"proc `[]`*(self: {typename}; index: int): {typename.item} = cast[ptr {typename.item}](interface_{typename}_operatorIndexConst(addr self, index))[]"
       &"proc `[]`*(self: var {typename}; index: int): var {typename.item} = cast[ptr {typename.item}](interface_{typename}_operatorIndex(addr self, index))[]"
       &"proc `[]=`*(self: var {typename}; index: int; value: {typename.item}) = cast[ptr {typename.item}](interface_{typename}_operatorIndex(addr self, index))[] = value"
-  of Keying:
-    weave multiline:
+    of Keying:
       &"proc `[]`*(self: {typename}; key: Variant): {typename.item} = cast[ptr {typename.item}](interface_{typename}_operatorIndexConst(addr self, addr key))[]"
       &"proc `[]`*(self: var {typename}; key: Variant): var {typename.item} = cast[ptr {typename.item}](interface_{typename}_operatorIndex(addr self, addr key))[]"
       &"proc `[]=`*(self: var {typename}; key: Variant; value: {typename.item}) = cast[ptr {typename.item}](interface_{typename}_operatorIndex(addr self, addr key))[] = value"

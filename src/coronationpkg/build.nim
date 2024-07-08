@@ -101,19 +101,19 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
 
           for builtin in api.builtin_classes:
             let sym = builtin.name.scan.convert(TypeSym)
-            if getignore(sym).module: continue
-            weave ($sym).nim
-                .import(corona_builtinclasses)
-                .import(bc_constructors):
-              weave Margin(thickness: 1):
-                weave multiline:
-                  if builtin.constants.isSome:
-                    "# constant values"
-                  for constant in builtin.constants.get(@[]):
-                    constant.weave(sym)
-                weave_subscript builtin
-                weave_operators builtin
-                weave_methods builtin
+            if not getignore(sym).module:
+              weave ($sym).nim
+                  .import(corona_builtinclasses)
+                  .import(bc_constructors):
+                weave Margin(thickness: 1):
+                  weave multiline:
+                    if builtin.constants.isSome:
+                      "# constant values"
+                    for constant in builtin.constants.get(@[]):
+                      constant.weave(sym)
+                  weave_subscript builtin
+                  weave_operators builtin
+                  weave_methods builtin
 
         let classindex = weave "classindex".nim
             .import(corona_classindex):

@@ -16,8 +16,9 @@ type
     subitems*: Table[string, VirtualNode]
 
 proc parent*(node: VirtualNode): VirtualNode {.inline.} =
-  if unlikely(node.isNil): return
-  node.pParent
+  if unlikely(node.isNil): nil
+  else:
+    node.pParent
 
 method name*(item: VirtualNode): string {.base.} = discard
 method ext*(item: VirtualNode): string {.base.} = discard
@@ -59,6 +60,10 @@ proc layout_impl(node, body: NimNode; chain: bool): NimNode =
         result.add expand_variable.newCall(nodesym, id[0].basename)
     of nnkForStmt:
       stmt[^1] = layout_internal.newCall(nodesym, stmt[^1])
+      result.add stmt
+    of nnkIfStmt:
+      for branch in stmt:
+        branch[^1] = layout_internal.newCall(nodesym, branch[^1])
       result.add stmt
     else:
       result.add place.newCall(nodesym, stmt)

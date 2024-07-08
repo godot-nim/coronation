@@ -44,12 +44,11 @@ func nativeValue*(e: EnumField): int =
 func flagkey(value: int; res: out int): bool =
   let l = log2 value.float32
   let f = l.floor
-  if f == l.ceil:
+  result = f == l.ceil
+  if result:
     res = int f
-    return true
   else:
     res = 0
-    return false
 
 proc fullfill_fields(renderable: Enum; values: seq[JsonEnumField]; is_bitfield: bool) =
   var sorted = values.sorted((x,y) => cmp(x.value, y.value))
@@ -124,16 +123,16 @@ proc weave*(renderable: Enum): Cloth =
 
   weave multiline:
     fmt"type {renderable.typename}*{pragmas} = enum"
-    weave indent2:
+    weave Indent.indent:
       for field in renderable.fields:
-        if alias in field.flags: continue
-        weave comment[field.commentedout]:
-          fmt"{field.name} = {field.value}{commentmsg}"
+        if alias notin field.flags:
+          weave comment[field.commentedout]:
+            fmt"{field.name} = {field.value}{commentmsg}"
 
     for field in renderable.fields:
-      if alias notin field.flags: continue
-      weave comment[field.commentedout]:
-        if bitset in field.flags:
-          fmt"template {field.name}*[T: {renderable.typename}](_: typedesc[T]): set[T] = cast[set[T]]({field.value}){commentmsg}"
-        else:
-          fmt"template {field.name}*[T: {renderable.typename}](_: typedesc[T]): T = T({field.value}){commentmsg}"
+      if alias in field.flags:
+        weave comment[field.commentedout]:
+          if bitset in field.flags:
+            fmt"template {field.name}*[T: {renderable.typename}](_: typedesc[T]): set[T] = cast[set[T]]({field.value}){commentmsg}"
+          else:
+            fmt"template {field.name}*[T: {renderable.typename}](_: typedesc[T]): T = T({field.value}){commentmsg}"
