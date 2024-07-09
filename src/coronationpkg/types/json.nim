@@ -102,7 +102,16 @@ type
     name*, format*: string
   JsonStructures* = seq[JsonStructure]
 
+  JsonHeader* = ref object
+    version_major*: int
+    version_minor*: int
+    version_patch*: int
+    version_status*: string
+    version_build*: string
+    version_full_name*: string
+
   JsonAPI* = ref object
+    header*: JsonHeader
     global_enums*: seq[JsonGlobalEnum]
     builtin_classes*: JsonBuiltinClasses
     classes*: JsonClasses

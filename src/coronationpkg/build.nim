@@ -26,10 +26,13 @@ import operators/classes/methods
 import operators/classes/properties
 import operators/classes/vmap
 
-import std/json
 import std/strformat
 import std/options
 import std/tables
+import std/os
+
+proc version*(header: JsonHeader): string =
+  &"{header.version_major}.{header.version_minor}.{header.version_patch}"
 
 let godotcore = dummy "godotcore".nim
 discard layout "godotcore/coronation".root:
@@ -56,7 +59,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
   # Define hierarchy structure of these with `layout`.
   # Describe file contents with `weave`.
   # Apply above definitions physical with `generate`.
-  layout config.outdir.root:
+  layout (config.outdir/config.package).root:
     layout "src".dir:
       layout config.package.nim
           .import(godotcore).export(godotcore):
@@ -138,25 +141,26 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
                 weave_properties class
                 weave_vmap(class)
 
-    weave config.package.nimble:
-      "# Package"
-      ""
-      "version       = \"4.1.0\""
-      "author        = \"godot-coronation by la.panon.\""
-      "description   = \"A GDExtension binding\""
-      "license       = \"MIT\""
-      "srcDir        = \"src\""
-      ""
-      ""
-      "# Dependencies"
-      ""
-      "requires \"nim >= 2.0.0\""
-      "# requires \"https://github.com/godot-nim/godotcore >= 0.1.0\""
-      "requires \"godotcore >= 0.1.0\""
+    weave config.package.nimble: &"""
+# Package
+
+version       = "{api.header.version}"
+author        = "coronation written by godot-nim, la.panon."
+description   = "A GDExtension binding"
+license       = "MIT"
+srcDir        = "src"
 
 
-proc run*(config: BuildConfig) =
-  let api = parseFile(config.apisource).to(JsonAPI)
+# Dependencies
+
+requires "nim >= 2.0.0"
+
+# if missing, please install from https://github.com/godot-nim/godotcore
+requires "godotcore >= 0.1.0"
+"""
+
+
+proc run*(api: JsonAPI; config: BuildConfig) =
 
   for class in api.classes:
     registerDB class.convert
@@ -167,6 +171,3 @@ proc run*(config: BuildConfig) =
     weave Prefix(prefix: "Dump: "):
       dumptree project
   generate project
-
-  echo &"Output: $ cd {config.outdir} && nimble install"
-  echo "Output: to install generated library."

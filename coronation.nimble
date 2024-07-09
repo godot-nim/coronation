@@ -1,7 +1,7 @@
 # Package
 
 version       = "0.1.0"
-author        = "la .panon."
+author        = "godot-nim, la.panon."
 description   = "A GDExtension generator for Nim-lang."
 license       = "MIT"
 srcDir        = "src"
