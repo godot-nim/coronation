@@ -34,7 +34,6 @@ import std/os
 proc version*(header: JsonHeader): string =
   &"{header.version_major}.{header.version_minor}.{header.version_patch}"
 
-let godotcore = dummy "godotcore".nim
 discard layout "godotcore/coronation".root:
   layout "builtinclasses".dir:
     let corona_constructors = dummy "constructors".nim
@@ -61,9 +60,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
   # Apply above definitions physical with `generate`.
   layout (config.outdir/config.package).root:
     layout "src".dir:
-      layout config.package.nim
-          .import(godotcore).export(godotcore):
-
+      layout config.package.nim:
         # [Global Enums]
         "globalenums".nim
         let globalenums = weave "globalenums".nim:

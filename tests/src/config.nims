@@ -1,3 +1,0 @@
---app: lib
---outDir: "$projectdir/../lib"
---path: "$projectdir/../../out/godot410/src"

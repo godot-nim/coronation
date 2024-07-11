@@ -3,5 +3,3 @@ nimble.paths
 
 out/
 bin/
-lib/
-.godot/
