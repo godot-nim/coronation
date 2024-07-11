@@ -2,18 +2,6 @@
 
 godot-nim/coronation provides a generator that generates any version of the GDExtension binding.
 
-## Quick Start
-
-```console
-coronation$ ./install.sh
-coronation$ cd tests
-coronation/tests$ nim c src/test
-coronation/tests$ file lib/libtest.so
-coronation/tests$ godot --editor
-```
-[install.sh](https://github.com/godot-nim/coronation/blob/main/install.sh) is a simple script that sets up godot package.
-This function will be moved to [minister](https://github.com/godot-nim/minister) soon.
-
 ## Requires
 
 * nim compiler >= 2.0.0
