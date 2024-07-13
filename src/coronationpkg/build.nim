@@ -130,7 +130,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
                 .import(globalenums, localenums, bc_constructors, classindex):
               weave Margin(thickness: 1):
                 if base != TypeSym"GodotClass":
-                  &"import {base}"
+                  &"import {base}; export {base}"
                 &"type {sym} = classIndex.{sym}"
                 weave Margin(thickness: 1):
                   for entry in class.json.methods.get(@[]):
