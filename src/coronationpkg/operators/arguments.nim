@@ -52,118 +52,133 @@ method name*(param: RenderableSelfArgument): VariableSym =
 # ===========================
 
 proc defaultValue(typesym: TypeSym; info: ParamInfo; value: string): string =
-  defer:
-    case info.attribute
-    of ptaNake:
-      return result
-    of ptaTypedArray:
-      return "typedArray[" & result & "]()"
-    of ptaSet:
-      return "{" & result & "}"
-
-  if typesym in enumDB:
+  result = if typesym in enumDB:
     let enumentry = enumDB[typesym]
     let v = value.parseInt
-    # Find matched Entry
-    for f in enumentry.fields:
-      if f.nativeValue == v and not f.commentedout:
-        if alias in f.flags:
-          result = "(" & $typesym & ")." & result
-        else:
-          result = $f.name
-        return
+    if bitfield in enumentry.flags:
+      var needle = 1
+      var targetnvs: seq[int]
+      while true:
+        if v < needle: break
+        if (v and needle) != 0:
+          targetnvs.add needle
+        needle = needle shl 1
 
-  if typesym in classDB:
-    return case value
+      var sets: seq[string]
+      for f in enumentry.fields:
+        if f.nativeValue in targetnvs and alias notin f.flags and not f.commentedout:
+          sets.add $f.name
+      "{" & sets.join(", ") & "}"
+    else:
+      # Find matched Entry
+      var named: string
+      for f in enumentry.fields:
+        if f.nativeValue == v and alias notin f.flags and not f.commentedout:
+          named = $f.name
+          break
+      named
+
+  elif typesym in classDB:
+    case value
     of "null":
       "default " & $typesym
     else:
       value
 
-  return case typesym
-  of TypeSym"String":
-    if value[0] == '"':
-      "gdstring" & value
-    else:
-      value.replace("String", "gdstring")
-
-  of TypeSym"StringName":
-    case value
-    of "&\"\"", "\"\"":
-      "stringName \"\""
-    else:
-      value
-
-  of TypeSym"Vector3", TypeSym"Vector3i":
-    value.replace("Vector3", "vector")
-
-  of TypeSym"Vector2", TypeSym"Vector2i":
-    value.replace("Vector2", "vector")
-
-  of TypeSym"Rect2", TypeSym"Rect2i":
-    value.replace("Rect2", "rect2")
-
-  of TypeSym"Transform3D":
-    case value
-    of "Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)":
-      "transform3D()"
-    else:
-      value.replace("Transform3D", "transform3D")
-
-  of TypeSym"Transform2D":
-    case value
-    of "Transform2D(1, 0, 0, 1, 0, 0)":
-      "transform2D()"
-    else:
-      value.replace("Transform2D", "transform2D")
-
-  of TypeSym"Color":
-      value.replace("Color", "color")
-
-  of TypeSym"Array":
-    case value
-    of "[]":
-      "gdarray()"
-    else:
-      value
-
-  of TypeSym"Dictionary":
-    case value
-    of "{}":
-      "dictionary()"
-    else:
-      value
-
-  of TypeSym"Callable":
-    case value
-    of "Callable()":
-      "callable()"
-    else:
-      value
-
-  of TypeSym"NodePath":
-    case value
-    of "NodePath(\"\")":
-      "nodePath()"
-    else:
-      value
-
-  of TypeSym"Variant":
-    case value
-    of "0", "null":
-      "default(Variant)"
-    else:
-      value
-
-  of TypeSym"uint32":
-    value & "'u32"
-
   else:
-    case value
-    of "null":
-      "nil"
+    case typesym
+    of TypeSym"String":
+      if value[0] == '"':
+        "gdstring" & value
+      else:
+        value.replace("String", "gdstring")
+
+    of TypeSym"StringName":
+      case value
+      of "&\"\"", "\"\"":
+        "stringName \"\""
+      else:
+        value
+
+    of TypeSym"Vector3", TypeSym"Vector3i":
+      value.replace("Vector3", "vector")
+
+    of TypeSym"Vector2", TypeSym"Vector2i":
+      value.replace("Vector2", "vector")
+
+    of TypeSym"Rect2", TypeSym"Rect2i":
+      value.replace("Rect2", "rect2")
+
+    of TypeSym"Transform3D":
+      case value
+      of "Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)":
+        "transform3D()"
+      else:
+        value.replace("Transform3D", "transform3D")
+
+    of TypeSym"Transform2D":
+      case value
+      of "Transform2D(1, 0, 0, 1, 0, 0)":
+        "transform2D()"
+      else:
+        value.replace("Transform2D", "transform2D")
+
+    of TypeSym"Color":
+        value.replace("Color", "color")
+
+    of TypeSym"Array":
+      case value
+      of "[]":
+        "gdarray()"
+      else:
+        value
+
+    of TypeSym"Dictionary":
+      case value
+      of "{}":
+        "dictionary()"
+      else:
+        value
+
+    of TypeSym"Callable":
+      case value
+      of "Callable()":
+        "callable()"
+      else:
+        value
+
+    of TypeSym"NodePath":
+      case value
+      of "NodePath(\"\")":
+        "nodePath()"
+      else:
+        value
+
+    of TypeSym"Variant":
+      case value
+      of "0", "null":
+        "default(Variant)"
+      else:
+        value
+
+    of TypeSym"uint32":
+      value & "'u32"
+
     else:
-      value
+      case value
+      of "null":
+        "nil"
+      else:
+        value
+
+  result = case info.attribute
+  of ptaNake:
+    result
+  of ptaTypedArray:
+    "typedArray[" & result & "]()"
+  else:
+    result
+
 
 
 proc preconvert*(param: RenderableParamBase; basetype: Option[string]) =

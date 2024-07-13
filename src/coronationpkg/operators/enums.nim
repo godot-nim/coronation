@@ -16,14 +16,18 @@ import std/tables
 
 type
   EnumFieldFlag* = enum
-    bitfield, bitset, alias
+    alias, bitset
+  EnumFlag* = enum
+    bitfield
   EnumField* = object
     commentedout*: bool
     flags*: set[EnumFieldFlag]
     name*: VariableSym
     value*: int
+    nativeValue*: int
     comment*: string
   Enum* = ref object
+    flags*: set[EnumFlag]
     typename*: TypeSym
     pragmas*: Pragmas
     fields*: seq[EnumField]
@@ -34,12 +38,6 @@ proc with_registerDB*(item: Enum): Enum =
   enumDB[item.typename] = item
   item
 
-
-func nativeValue*(e: EnumField): int =
-  if bitfield in e.flags:
-    1 shl e.value
-  else:
-    e.value
 
 func flagkey(value: int; res: out int): bool =
   let l = log2 value.float32
@@ -53,13 +51,14 @@ func flagkey(value: int; res: out int): bool =
 proc fullfill_fields(renderable: Enum; values: seq[JsonEnumField]; is_bitfield: bool) =
   var sorted = values.sorted((x,y) => cmp(x.value, y.value))
   renderable.fields = newSeqOfCap[EnumField](sorted.len)
+  if is_bitfield: renderable.flags.incl bitfield
   var enumval = int.low
   var fbit: int
   for i, item in sorted:
     var field = EnumField(name: item.name.scan.convert(VariableSym))
+    field.nativeValue = item.value
     if is_bitfield:
       if item.value.flagkey(fbit):
-        field.flags.incl bitfield
         if item.value == 0:
           field.value = 0
           field.commentedout = true
@@ -82,9 +81,9 @@ proc padding_bitfield(renderable: Enum) =
     if not item.commentedout and item.value == 0:
       break
     if not item.commentedout and item.value > 0:
-      renderable.fields.insert(EnumField(name: "--PADDING-MIN--".scan.convert(VariableSym), value: 0, flags: {bitfield}, comment: fmt"To align size-of set[{renderable.typename}] to size-of cuint."), i)
+      renderable.fields.insert(EnumField(name: "--PADDING-MIN--".scan.convert(VariableSym), value: 0, comment: fmt"To align size-of set[{renderable.typename}] to size-of cuint."), i)
       break
-  renderable.fields.add EnumField(name: "--PADDING-MAX--".scan.convert(VariableSym), value: 31, flags: {bitfield}, comment: fmt"To align size-of set[{renderable.typename}] to size-of cuint.")
+  renderable.fields.add EnumField(name: "--PADDING-MAX--".scan.convert(VariableSym), value: 31, comment: fmt"To align size-of set[{renderable.typename}] to size-of cuint.")
 
 proc convert*(raw: JsonGlobalEnum): Enum =
   new result
