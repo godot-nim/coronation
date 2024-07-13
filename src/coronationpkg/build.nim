@@ -61,7 +61,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
   # Apply above definitions physical with `generate`.
   layout (config.outdir/config.package).root:
     layout "src".dir:
-      layout config.package.nim:
+      layout config.package.dir:
         # [Global Enums]
         "globalenums".nim
         let globalenums = weave "globalenums".nim:
