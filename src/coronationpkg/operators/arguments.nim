@@ -166,7 +166,7 @@ proc defaultValue(typesym: TypeSym; info: ParamInfo; value: string): string =
       value
 
 
-proc preconvert(param: RenderableParamBase; basetype: Option[string]) =
+proc preconvert*(param: RenderableParamBase; basetype: Option[string]) =
   if basetype.isNone:
     param.typesym = TypeSym.Void
     return
