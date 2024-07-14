@@ -70,7 +70,7 @@ macro weave*(source: NimSource; body): NimSource =
 
 method name(source: NimSource): string = source.modulename
 method ext(source: NimSource): string = ".nim"
-method contents(source: NimSource): Cloth = weave Margin(thickness: 1):
+method contents(source: NimSource): Cloth = weave margin:
   if Dummy notin source.metadata.flags:
     if not source.metadata.enableWarning.unusedImport:
       "{.warning[UnusedImport]:off.}"

@@ -141,7 +141,7 @@ proc weave_operators*(json: JsonBuiltinClass): Cloth =
 
     weave transact:
       &"process eventindex.init_engine.on_load_builtinclassOperator:"
-      weave Proof(elements: 1) & Indent.indent:
+      weave Proof(elements: 1) & cloths.indent:
         for op in operators:
           if ignore.operator:
             if op.containerkey in ignore.operator_white:

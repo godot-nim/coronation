@@ -124,7 +124,7 @@ proc weave(entry: ClassMethodPtrCallEntry): Cloth =
 
   weave multiline:
     weave ProcKey entry
-    weave Indent.indent:
+    weave cloths.indent:
       entry.methodbind
       if entry.args.len != 0:
         &"var `?param` = {paramarray}"
@@ -150,7 +150,7 @@ proc weave(entry: ClassMethodVarargsVariantEntry): Cloth =
 
   weave multiline:
     weave ProcKey entry
-    weave Indent.indent:
+    weave cloths.indent:
       entry.methodbind
       &"var `?param` = newSeqOfCap[VariantPtr]({argCount})"
       &"`?param`.add {paramarray}"
@@ -167,7 +167,7 @@ proc weave(entry: ClassMethodVarargsTypedEntry): Cloth =
     fixed_args = entry.args[0..^2].mapIt("variant " & $it.name).join(", ")
   weave multiline:
     weave ProcKey entry
-    weave Indent.indent:
+    weave cloths.indent:
       &"{entry.name}({entry.self.name}, {fixed_args}, {vararg.name})"
 
 proc weave(entry: ClassMethodVirtualEntry): Cloth =
@@ -178,7 +178,7 @@ proc weave(entry: ClassMethodVirtualEntry): Cloth =
 proc weave_native(entry: ClassMethodVirtualEntry): Cloth =
   weave multiline:
     &"proc {entry.name}*(p_instance: ClassInstancePtr; p_args: ptr UncheckedArray[ConstTypePtr]; r_ret: TypePtr) {{.gdcall.}} ="
-    weave Indent.indent >> Join(delim: ""):
+    weave cloths.indent >> Join(delim: ""):
       &"cast[{entry.self.typesym}](p_instance).{entry.name}("
       weave Join(delim: ", "):
         for i, arg in entry.args:

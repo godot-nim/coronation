@@ -81,7 +81,7 @@ proc weave_procdef*(entry: BuiltinClassMethodEntry): Cloth =
 
   weave multiline:
     weave ProcKey entry
-    weave Indent.indent:
+    weave cloths.indent:
       if entry.args.len != 0:
         &"let argArr = [" & entry.args.mapIt(&"getPtr {it.name}").join(", ") & "]"
       &"{entry.containerKey}({p_self}, {p_args}, {p_result}, {entry.args.len})"
@@ -100,7 +100,7 @@ proc weave_methods*(json: JsonBuiltinClass): Cloth =
       )))
     .filterIt((not ignore.procedure) or it.containerKey in ignore.procedure_white)
 
-  weave Margin(thickness: 1):
+  weave margin:
     if methods.len != 0:
       weave multiline:
         for entry in methods:
@@ -112,7 +112,7 @@ proc weave_methods*(json: JsonBuiltinClass): Cloth =
 
       weave multiline:
         &"process eventindex.init_engine.on_load_builtinclassMethod:"
-        weave Indent.indent:
+        weave cloths.indent:
           "var proc_name: StringName"
           for entry in methods:
             weave_loadstmt entry

@@ -65,13 +65,13 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
         # [Global Enums]
         "globalenums".nim
         let globalenums = weave "globalenums".nim:
-          weave Margin(thickness: 1):
+          weave margin:
             for globalenum in api.global_enums:
               weave with_registerDB globalenum.convert
 
         # [Local Enums]
         let localenums = weave "localenums".nim:
-          weave Margin(thickness: 1):
+          weave margin:
             for builtin in api.builtin_classes:
               let sym = builtin.name.scan.convert(TypeSym)
               for localenum in builtin.enums.get(@[]):
@@ -85,7 +85,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
         weave "structs".nim
             .import(corona_structs)
             .import(localenums):
-          weave Margin(thickness: 1):
+          weave margin:
             for struct in api.native_structures:
               weave struct.convert
 
@@ -96,7 +96,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
           let bc_constructors = weave "constructors".nim
               .import(corona_constructors)
               .import(tune_constructors).export(tune_constructors):
-            weave Margin(thickness: 1):
+            weave margin:
               for builtin in api.builtin_classes:
                 weave_constructor builtin
 
@@ -106,7 +106,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
               weave ($sym.convert(ModuleSym)).nim
                   .import(corona_builtinclasses)
                   .import(bc_constructors):
-                weave Margin(thickness: 1):
+                weave margin:
                   weave margin:
                     if builtin.constants.isSome:
                       "# constant values"
@@ -118,7 +118,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
 
         let classindex = weave "classindex".nim
             .import(corona_classindex):
-          weave Margin(thickness: 1):
+          weave margin:
             for base, sym in inheritanceDB.hierarchical:
               weave_index classDB[sym]
 
@@ -129,10 +129,10 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
             weave ($sym.convert(ModuleSym)).nim
                 .import(corona_classes)
                 .import(globalenums, localenums, bc_constructors, classindex):
-              weave Margin(thickness: 1):
+              weave margin:
                 if base != TypeSym"GodotClass":
                   &"import {base}; export {base}"
-                weave Margin(thickness: 1):
+                weave margin:
                   for entry in class.json.methods.get(@[]):
                     weave entry.convert(sym)
                 weave_properties class

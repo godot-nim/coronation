@@ -29,7 +29,7 @@ proc weave*(json: JsonConstructor; typesym: TypeSym): Cloth =
 
   weave multiline:
     weave entry
-    weave Indent.indent:
+    weave cloths.indent:
       if entry.args.len != 0:
         &"let argArr = [" & entry.args.mapIt(&"getPtr {it.name}").join(", ") & "]"
       let argptr = if entry.args.len == 0: "nil" else: "addr argArr[0]"
@@ -51,7 +51,7 @@ proc weave_constructor*(self: JsonBuiltinClass): Cloth =
     else:
       let idxrange_str = ($idxRange).replace("@", "")
       let constr = &"{typesym}_constr"
-      weave Margin(thickness: 1):
+      weave margin:
         weave multiline:
           &"var {constr}: array[{self.constructors.len}, PtrConstructor]"
           &"process eventindex.init_engine.on_load_builtinclassConstructor:"

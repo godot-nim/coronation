@@ -122,7 +122,7 @@ proc weave*(renderable: Enum): Cloth =
 
   weave multiline:
     fmt"type {renderable.typename}*{pragmas} = enum"
-    weave Indent.indent:
+    weave cloths.indent:
       for field in renderable.fields:
         if alias notin field.flags:
           weave comment[field.commentedout]:

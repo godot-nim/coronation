@@ -8,7 +8,7 @@ import std/options
 import std/strformat
 
 proc weave_properties*(class: Class): Cloth =
-  weave Margin(thickness: 1):
+  weave margin:
     for prop in class.json.properties.get(@[]):
       weave multiline:
         let index_get = (if prop.index.isSome: $prop.index.get else: "")

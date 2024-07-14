@@ -61,7 +61,7 @@ proc convert*(json: JsonStructure): RenderableStructure =
   )
 
 proc weave*(renderable: RenderableStructure): Cloth =
-  var entries = cloth Indent.indent
+  var entries = cloth cloths.indent
   result = weave multiline:
     &"type {renderable.typename}* = object"
     entries
