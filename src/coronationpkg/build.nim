@@ -131,7 +131,8 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
                 .import(globalenums, localenums, bc_constructors, classindex):
               weave margin:
                 if base != TypeSym"GodotClass":
-                  &"import {base}; export {base}"
+                  let mdlbase = base.convert(ModuleSym)
+                  &"import {mdlbase}; export {mdlbase}"
                 weave margin:
                   for entry in class.json.methods.get(@[]):
                     weave entry.convert(sym)
