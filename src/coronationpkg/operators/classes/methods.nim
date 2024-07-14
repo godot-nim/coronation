@@ -177,7 +177,7 @@ proc weave(entry: ClassMethodVirtualEntry): Cloth =
 
 proc weave_native(entry: ClassMethodVirtualEntry): Cloth =
   weave multiline:
-    &"proc {entry.name}*(p_instance: ClassInstancePtr; p_args: ptr UncheckedArray[ConstTypePtr]; r_ret: TypePtr) {{.gdcall.}} ="
+    &"proc {entry.name}(p_instance: ClassInstancePtr; p_args: ptr UncheckedArray[ConstTypePtr]; r_ret: TypePtr) {{.gdcall.}} ="
     weave cloths.indent >> Join(delim: ""):
       &"cast[{entry.self.typesym}](p_instance).{entry.name}("
       weave Join(delim: ", "):
@@ -187,6 +187,7 @@ proc weave_native(entry: ClassMethodVirtualEntry): Cloth =
         ")"
       else:
         ").encode(r_ret)"
+    &"template {entry.name}_bind*(_: typedesc[{entry.self.typesym}]): ClassCallVirtual = {entry.name}"
 
 proc convert*(json: JsonClassMethod; caller: TypeSym): RenderableClassMethod =
   let self_type = RenderableSelfArgument(
