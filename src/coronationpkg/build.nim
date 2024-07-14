@@ -132,7 +132,6 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
               weave Margin(thickness: 1):
                 if base != TypeSym"GodotClass":
                   &"import {base}; export {base}"
-                &"type {sym} = classIndex.{sym}"
                 weave Margin(thickness: 1):
                   for entry in class.json.methods.get(@[]):
                     weave entry.convert(sym)
