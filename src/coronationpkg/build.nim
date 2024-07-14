@@ -107,7 +107,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
                   .import(corona_builtinclasses)
                   .import(bc_constructors):
                 weave Margin(thickness: 1):
-                  weave multiline:
+                  weave margin:
                     if builtin.constants.isSome:
                       "# constant values"
                     for constant in builtin.constants.get(@[]):
