@@ -103,7 +103,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
           for builtin in api.builtin_classes:
             let sym = builtin.name.scan.convert(TypeSym)
             if not getignore(sym).module:
-              weave ($sym).nim
+              weave ($sym.convert(ModuleSym)).nim
                   .import(corona_builtinclasses)
                   .import(bc_constructors):
                 weave Margin(thickness: 1):
@@ -126,7 +126,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
         layout "classes".dir:
           for base, sym in inheritanceDB.hierarchical:
             let class = classDB[sym]
-            weave ($sym).nim
+            weave ($sym.convert(ModuleSym)).nim
                 .import(corona_classes)
                 .import(globalenums, localenums, bc_constructors, classindex):
               weave Margin(thickness: 1):
