@@ -11,14 +11,17 @@ import std/strformat
 
 proc weave_vmap*(class: Class): Cloth = weave multiline:
   let vmethods = class.json.methods.get(@[]).filterIt(it.isVirtual)
+  let super =
+    if class.inherits == TypeSym"GodotClass":
+      "  "
+    else:
+      &"  {class.inherits}_vmap.concat "
+
   &"let {class.typesym}_vmap* ="
   if vmethods.len == 0:
-    "  initTable[string, string]()"
+    super & "initTable[string, string]()"
   else:
-    if class.inherits == TypeSym"GodotClass":
-      "  toTable {"
-    else:
-      &"  {class.inherits}_vmap.concat" & " toTable {"
+    super & "toTable {"
     weave Indent(level: 4):
       for entry in vmethods:
         "\"" & $entry.name.scan.convert(ProcSym) & "\" : \"" & $entry.name & "\","
