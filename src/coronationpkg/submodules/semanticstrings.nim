@@ -3,15 +3,18 @@ import submodules/wordropes
 import std/hashes
 import std/strutils
 
-type VariableSym* = distinct string
-proc `$`*(a: VariableSym): string {.borrow.}
-proc `==`*(a, b: VariableSym): bool {.borrow.}
-proc hash*(a: VariableSym): Hash {.borrow.}
+template gensem(name): untyped =
+  type name* = distinct string
+  proc `$`*(a: name): string {.borrow.}
+  proc `==`*(a, b: name): bool {.borrow.}
+  proc hash*(a: name): Hash {.borrow.}
 
-type TypeSym* = distinct string
-proc `$`*(a: TypeSym): string {.borrow.}
-proc `==`*(a, b: TypeSym): bool {.borrow.}
-proc hash*(a: TypeSym): Hash {.borrow.}
+gensem VariableSym
+gensem TypeSym
+gensem ProcSym
+gensem VariantType
+gensem ContainerKey
+gensem ModuleSym
 
 proc typefy*(sym: VariableSym): TypeSym =
   TypeSym capitalizeAscii string sym
@@ -23,16 +26,6 @@ template Void*(_: typedesc[TypeSym]): TypeSym = TypeSym"void"
 template Variant*(_: typedesc[TypeSym]): TypeSym = TypeSym"Variant"
 template GodotClass*(_: typedesc[TypeSym]): TypeSym = TypeSym"GodotClass"
 
-type ProcSym* = distinct string
-proc `$`*(a: ProcSym): string {.borrow.}
-proc `==`*(a, b: ProcSym): bool {.borrow.}
-proc hash*(a: ProcSym): Hash {.borrow.}
-
-type VariantType* = distinct string
-proc `$`*(typekey: VariantType): string = string typekey
-proc `==`*(a, b: VariantType): bool {.borrow.}
-proc hash*(a: VariantType): Hash {.borrow.}
-
 func variantType*(typesym: TypeSym): VariantType =
   VariantType:
     if typesym in [TypeSym.Variant, TypeSym.Void]:
@@ -41,12 +34,6 @@ func variantType*(typesym: TypeSym): VariantType =
       "VariantType_Object"
     else:
       "VariantType_" & $typesym
-
-type ContainerKey* = distinct string
-proc `$`*(containerkey: ContainerKey): string = string containerkey
-proc `==`*(a, b: ContainerKey): bool {.borrow.}
-proc hash*(a: ContainerKey): Hash {.borrow.}
-
 
 proc erase(str: string; target: string): string {.inline.} = str.replace(target, "")
 proc quoted*(w: string): string = "`" & w.erase("`") & "`"
@@ -109,6 +96,8 @@ proc convert*(ss: WordRope; _: typedesc[ProcSym]): ProcSym =
       else:      w.pascal
   ProcSym escapeVariable str
 
+proc convert*(typesym: TypeSym; _: typedesc[ModuleSym]): ModuleSym =
+  ModuleSym ($typesym).toLowerAscii
 
 when isMainModule:
   echo scan("set_getter").convert(ProcSym)
