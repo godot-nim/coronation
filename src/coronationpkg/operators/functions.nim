@@ -62,4 +62,4 @@ proc gen_containerKey*(prockey: ProcKey): ContainerKey =
       if arg.typesym notin [TypeSym.Void]:
         text.add " "
         text.add $arg.typesym
-  ContainerKey "`" & text & "`"
+  ContainerKey "`[" & text & "]`"
