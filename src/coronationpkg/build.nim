@@ -17,6 +17,7 @@ import submodules/semanticstrings
 import operators/enums
 import operators/structs
 import operators/constants
+import operators/utilityfuncs
 import operators/builtinclasses/constructors
 import operators/builtinclasses/subscripts
 import operators/builtinclasses/operators
@@ -27,6 +28,7 @@ import operators/classes/properties
 import operators/classes/vmap
 import operators/classes/signals
 
+import std/sequtils
 import std/strformat
 import std/options
 import std/tables
@@ -42,6 +44,7 @@ discard layout "godotcore/coronation".root:
   let corona_structs = dummy "structs".nim
   let corona_classindex = dummy "classindex".nim
   let corona_classes = dummy "classes".nim
+  let corona_utilityfuncs = dummy "utilityfuncs".nim
 discard layout "godotcore/tune".root:
   layout "builtinclasses".dir:
     let tune_constructors = dummy "constructors".nim
@@ -88,6 +91,23 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
           weave margin:
             for struct in api.native_structures:
               weave struct.convert
+
+        # [Utility Functions]
+        weave "utilityfuncs".nim
+            .import(corona_utilityfuncs):
+          let utilfuncs = api.utility_functions.mapIt(convert it)
+          weave margin:
+            weave multiline:
+              for utilfunc in utilfuncs:
+                weave_container utilfunc
+            for utilfunc in utilfuncs:
+              weave_procdef utilfunc
+            weave multiline:
+              "proc load* ="
+              weave indent:
+                "var proc_name: StringName"
+                for utilfunc in utilfuncs:
+                  weave_loadstmt utilfunc
 
         # [Builtin Classes]
         layout "builtinclasses".nim

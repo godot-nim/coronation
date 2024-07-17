@@ -27,6 +27,7 @@ type
   JsonUtilityFunction* = ref object of JsonProcBase
     hash*: int
     return_type*: Option[string]
+    category*: string
   JsonBuiltinClassMethod* = ref object of JsonProcBase
     is_const*: bool
     is_static*: bool
@@ -113,6 +114,7 @@ type
   JsonAPI* = ref object
     header*: JsonHeader
     global_enums*: seq[JsonGlobalEnum]
+    utility_functions*: seq[JsonUtilityFunction]
     builtin_classes*: JsonBuiltinClasses
     classes*: JsonClasses
     native_structures*: JsonStructures
