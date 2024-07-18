@@ -50,16 +50,18 @@ proc weave*(procKey: ProcKey): Cloth =
   result = clothfy head
 
 proc gen_containerKey*(prockey: ProcKey): ContainerKey =
-  ## FORMAT: SELFTYPE_PROCNAME(_ARGS..)
+  ## FORMAT: `PROCNAME(ARGTYPE,...)`
   ## ARGS will be expanded only when the SELFTYPE is none
   var text: string
+  var args: seq[string]
   if prockey.self != nil:
-    text.add $prockey.self.typesym
-    text.add " "
+    args.add $prockey.self.typesym
+  for arg in prockey.args:
+    if arg.typesym notin [TypeSym.Void]:
+      args.add $arg.typesym
+
   text.add ($prockey.name).replace("`", "")
-  if prockey.self == nil:
-    for arg in prockey.args:
-      if arg.typesym notin [TypeSym.Void]:
-        text.add " "
-        text.add $arg.typesym
-  ContainerKey "`[" & text & "]`"
+  text.add "("
+  text.add args.join(",")
+  text.add ")"
+  ContainerKey "`" & text & "`"

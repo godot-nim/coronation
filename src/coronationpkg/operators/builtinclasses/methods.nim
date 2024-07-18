@@ -13,6 +13,7 @@ import std/options
 import std/strformat
 import std/strutils
 import std/sequtils
+import std/sets
 
 type
   BuiltinClassMethodEntry* = ref object of GodotProc
@@ -88,31 +89,37 @@ proc weave_procdef*(entry: BuiltinClassMethodEntry): Cloth =
 
 proc weave_methods*(json: JsonBuiltinClass): Cloth =
   let typesym = json.name.scan.convert(TypeSym)
-  let ignore = getignore(typeSym)
 
-  let methods = json.methods.get(@[])
-    .mapIt(it.convert(RenderableSelfArgument(
+  proc extract_self(it: JsonBuiltinClassMethod): RenderableSelfArgument =
+    RenderableSelfArgument(
       typeSym: typeSym,
       info: ParamInfo(
-        ismutable: not it.is_const
+        ismutable: not it.is_const,
       ),
       isStatic: it.isStatic,
-      )))
-    .filterIt((not ignore.procedure) or it.containerKey in ignore.procedure_white)
+    )
+
+  let methods = json.methods.get(@[])
+    .mapIt(it.convert(extract_self it))
+  let requires = methods
+    .filterIt(it.containerKey notin manualImplemented.functions)
 
   weave margin:
     if methods.len != 0:
       weave multiline:
         for entry in methods:
-          weave_container entry
+          if entry.containerKey in manualImplemented.functions:
+            "# " & $entry.containerKey
+          else:
+            weave_container entry
 
       weave multiline:
-        for entry in methods:
+        for entry in requires:
           weave_procdef entry
 
       weave multiline:
         &"process eventindex.init_engine.on_load_builtinclassMethod:"
         weave cloths.indent:
           "var proc_name: StringName"
-          for entry in methods:
+          for entry in requires:
             weave_loadstmt entry

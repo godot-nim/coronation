@@ -13,6 +13,7 @@ import std/sequtils
 import std/options
 import std/strformat
 import std/tables
+import std/sets
 
 import config
 
@@ -31,8 +32,15 @@ func operator(basename: string): ProcSym =
     of "in": "contains"
     of "unary+": "`+`"
     of "unary-": "`-`"
+    of "//": "`div`"
+    of "%": "`mod`"
+    of "<<": "`shl`"
+    of ">>": "`shr`"
+    of "&": "`and`"
+    of "|": "`or`"
+    of "^": "`xor`"
+    of "~": "`not`"
     else: "`" & basename & "`"
-
 const EscapeSign = toTable {
   "==": "Equal",
   "!=": "NotEqual",
@@ -118,33 +126,27 @@ proc weave_loadstmt(operator: BuiltinClassOperator): Cloth =
 
 proc weave_operators*(json: JsonBuiltinClass): Cloth =
   let typesym = json.name.scan.convert(TypeSym)
-  let ignore = getignore(typesym)
-  if ignore.operator and ignore.operator_white.len == 0: return
 
-  let operators = json.operators.get(@[]).mapIt(it.convert(typesym))
+  let operators = json.operators.get(@[])
+    .mapIt(it.convert(typesym))
+  let requires = operators
+    .filterIt(it.containerkey notin manualImplemented.functions)
+
+  if operators.len == 0: return
 
   weave multiline:
     weave multiline:
       for op in operators:
-        if ignore.operator:
-          if op.containerkey in ignore.operator_white:
-            weave_container op
+        if op.containerkey in manualImplemented.functions:
+          "# " & $op.containerkey
         else:
           weave_container op
     weave multiline:
-      for op in operators:
-        if ignore.operator:
-          if op.containerkey in ignore.operator_white:
-            weave_procdef op
-        else:
-          weave_procdef op
+      for op in requires:
+        weave_procdef op
 
     weave transact:
       &"process eventindex.init_engine.on_load_builtinclassOperator:"
       weave Proof(elements: 1) & cloths.indent:
-        for op in operators:
-          if ignore.operator:
-            if op.containerkey in ignore.operator_white:
-              weave_loadstmt op
-          else:
-            weave_loadstmt op
+        for op in requires:
+          weave_loadstmt op
