@@ -62,6 +62,6 @@ proc gen_containerKey*(prockey: ProcKey): ContainerKey =
 
   text.add ($prockey.name).replace("`", "")
   text.add "("
-  text.add args.join(",")
+  text.add args.join(" ")
   text.add ")"
   ContainerKey "`" & text & "`"
