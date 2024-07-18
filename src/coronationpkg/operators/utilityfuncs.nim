@@ -2,11 +2,11 @@ import cloths
 
 import submodules/[ wordropes, semanticstrings ]
 
-import functions, arguments
+import functions, arguments, config
 
 import types/json
 
-import std/[ options, sequtils, strutils, strformat ]
+import std/[ options, sequtils, strutils, strformat, sets ]
 
 proc extract_result(self: JsonUtilityFunction): RenderableResult =
   convertToResult self.return_type
@@ -35,6 +35,7 @@ type UtilityFunction* = object
   key: ProcKey
   container: ContainerKey
   json: JsonUtilityFunction
+  isImplemented: bool
 
 proc convert*(json: JsonUtilityFunction): UtilityFunction =
   result.key = ProcKey(
@@ -45,15 +46,22 @@ proc convert*(json: JsonUtilityFunction): UtilityFunction =
   )
   result.container = gen_containerKey result.key
   result.json = json
+  result.isImplemented = result.container in manualImplemented.functions
 
 proc weave_container*(utilfunc: UtilityFunction): Cloth =
-  &"var {utilfunc.container}: PtrUtilityFunction"
+  if utilfunc.isImplemented:
+    &"# {utilfunc.container}"
+  else:
+    &"var {utilfunc.container}: PtrUtilityFunction"
 
-proc weave_loadstmt*(utilfunc: UtilityFunction): Cloth = weave multiline:
-  &"proc_name = stringName \"{utilfunc.json.name}\""
-  &"{utilfunc.container} = interfaceVariantGetPtrUtilityFunction(getPtr proc_name, {utilfunc.json.hash})"
+proc weave_loadstmt*(utilfunc: UtilityFunction): Cloth =
+  if utilfunc.isImplemented: return
+  weave multiline:
+    &"proc_name = stringName \"{utilfunc.json.name}\""
+    &"{utilfunc.container} = interfaceVariantGetPtrUtilityFunction(getPtr proc_name, {utilfunc.json.hash})"
 
 proc weave_procdef*(utilfunc: UtilityFunction): Cloth =
+  if utilfunc.isImplemented: return
   weave multiline:
     weave utilfunc.key
     weave cloths.indent:
