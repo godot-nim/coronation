@@ -76,41 +76,26 @@ proc fullfill_fields(renderable: Enum; values: seq[JsonEnumField]; is_bitfield: 
     enumval = item.value
     renderable.fields.add field
 
-proc padding_bitfield(renderable: Enum) =
-  for i, item in renderable.fields:
-    if not item.commentedout and item.value == 0:
-      break
-    if not item.commentedout and item.value > 0:
-      renderable.fields.insert(EnumField(name: "--PADDING-MIN--".scan.convert(VariableSym), value: 0, comment: fmt"To align size-of set[{renderable.typename}] to size-of cuint."), i)
-      break
-  renderable.fields.add EnumField(name: "--PADDING-MAX--".scan.convert(VariableSym), value: 31, comment: fmt"To align size-of set[{renderable.typename}] to size-of cuint.")
-
 proc convert*(raw: JsonGlobalEnum): Enum =
   new result
   result.typename = raw.name.scan.convert(TypeSym)
-  result.pragmas.list.add "size: sizeof(cuint)"
   let is_bitfield = raw.is_bitfield.get(false)
 
   fullfill_fields(result, raw.values, is_bitfield)
-  if is_bitfield: padding_bitfield(result)
 
 proc convert*(raw: JsonClassEnum; caller: TypeSym): Enum =
   new result
   result.typename = fmt("{caller}.{raw.name}").scan.convert(TypeSym)
-  result.pragmas.list.add "size: sizeof(cuint)"
   let is_bitfield = raw.is_bitfield.get(false)
 
   fullfill_fields(result, raw.values, is_bitfield)
-  if is_bitfield: padding_bitfield(result)
 
 proc convert*(raw: JsonBuiltinClassEnum; caller: TypeSym): Enum =
   new result
   result.typename = fmt("{caller}.{raw.name}").scan.convert(TypeSym)
-  result.pragmas.list.add "size: sizeof(cuint)"
   let is_bitfield = raw.is_bitfield.get(false)
 
   fullfill_fields(result, raw.values, is_bitfield)
-  if is_bitfield: padding_bitfield(result)
 
 
 proc weave*(renderable: Enum): Cloth =
