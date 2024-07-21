@@ -141,6 +141,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
           weave margin:
             for base, sym in inheritanceDB.hierarchical:
               weave_index classDB[sym]
+            "template isRefCounted*(_: typedesc[RefCounted]): static bool = true"
 
         # layout "classes".nim:
         layout "classes".dir:
