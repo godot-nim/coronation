@@ -182,7 +182,7 @@ proc weave_native(entry: ClassMethodVirtualEntry): Cloth =
       &"cast[{entry.self.typesym}](p_instance).{entry.name}("
       weave Join(delim: ", "):
         for i, arg in entry.args:
-          &"p_args[{i}].decode({arg.typesym})"
+          &"p_args[{i}].decode({arg.type})"
       if entry.result.typesym == TypeSym"void":
         ")"
       else:

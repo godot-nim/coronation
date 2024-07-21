@@ -51,8 +51,41 @@ method name*(param: RenderableSelfArgument): VariableSym =
 # Default-Value Calculation #
 # ===========================
 
-proc defaultValue(typesym: TypeSym; info: ParamInfo; value: string): string =
-  result = if typesym in enumDB:
+proc `type`*(param: RenderableParamBase): string =
+  let name = "ptr ".repeat(param.info.ptrdepth) & $param.typeSym
+  try:
+    let class = classDB[param.typeSym]
+    if class.json.isRefCounted:
+      return "gdref " & name
+
+  except: discard
+  result = case param.info.attribute
+  of ptaNake:
+    name
+  of ptaSet:
+    &"set[{name}]"
+  of ptaTypedArray:
+    &"TypedArray[{name}]"
+
+  if param.info.ismutable:
+    return "var " & result
+  if param.info.isVarargs:
+    return &"varargs[{result}]"
+
+proc `type`*(param: RenderableArgument): string =
+  param.RenderableParamBase.type
+
+proc `type`*(param: RenderableSelfArgument): string =
+  result = $param.typeSym
+  if param.info.ismutable:
+    return "var " & result
+
+proc `type`*(param: RenderableResult): string =
+  param.RenderableParamBase.type
+
+proc fixDefaultValue(arg: RenderableArgument; value: string) =
+  let typesym = arg.typesym
+  var default = if typesym in enumDB:
     let enumentry = enumDB[typesym]
     let v = value.parseInt
     if bitfield in enumentry.flags:
@@ -81,7 +114,7 @@ proc defaultValue(typesym: TypeSym; info: ParamInfo; value: string): string =
   elif typesym in classDB:
     case value
     of "null":
-      "default " & $typesym
+      "default " & $arg.type
     else:
       value
 
@@ -171,13 +204,15 @@ proc defaultValue(typesym: TypeSym; info: ParamInfo; value: string): string =
       else:
         value
 
-  result = case info.attribute
+  default = case arg.info.attribute
   of ptaNake:
-    result
+    default
   of ptaTypedArray:
-    "typedArray[" & result & "]()"
+    "typedArray[" & default & "]()"
   else:
-    result
+    default
+
+  arg.default_value = some default
 
 
 
@@ -210,30 +245,9 @@ proc convert*(raw: JsonArgument): RenderableArgument =
   preconvert(result, some raw.meta.get(raw.`type`))
   result.variableSym = raw.name.replace("result", "retval").scan.convert(VariableSym)
   if raw.default_value.isSome:
-    result.default_value = some result.typesym.defaultValue(result.info, get raw.default_value)
+    fixDefaultValue(result, get raw.default_value)
 
 
-
-proc `type`(param: RenderableParamBase): string =
-  let name = "ptr ".repeat(param.info.ptrdepth) & $param.typeSym
-  result = case param.info.attribute
-  of ptaNake:
-    name
-  of ptaSet:
-    &"set[{name}]"
-  of ptaTypedArray:
-    &"TypedArray[{name}]"
-
-  # try:
-  #   let class = classDB[param.typesym]
-  #   if class.json.is_refcounted:
-  #     result = &"GD_ref[{name}]"
-  # except: discard
-
-  if param.info.ismutable:
-    return "var " & result
-  if param.info.isVarargs:
-    return &"varargs[{result}]"
 
 proc weave*(renderable: RenderableResult): Cloth =
   &"{renderable.type}"
