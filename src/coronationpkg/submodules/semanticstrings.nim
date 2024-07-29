@@ -97,7 +97,7 @@ proc convert*(ss: WordRope; _: typedesc[ProcSym]): ProcSym =
   ProcSym escapeVariable str
 
 proc convert*(typesym: TypeSym; _: typedesc[ModuleSym]): ModuleSym =
-  ModuleSym "gd" & $typesym
+  ModuleSym "gd" & ($typesym).toLowerAscii
 
 when isMainModule:
   echo scan("set_getter").convert(ProcSym)
