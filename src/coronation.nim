@@ -9,7 +9,7 @@ import types/json
 
 const version = gorge("git tag")
 
-proc coronation*(apisource: string; outdir= "out"; package= "godotgen"; version_control= true) =
+proc coronation*(apisource: string; outdir= "out"; package= "gdextgen"; version_control= true) =
   ## Description:
   ##   Read API spec from `apisource`, generate godot package named `package` into `outdir`.
   ##

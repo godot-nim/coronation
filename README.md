@@ -6,7 +6,7 @@ godot-nim/coronation provides a generator that generates any version of the GDEx
 
 * nim compiler >= 2.0.0
 * [panno8m/cloths](https://github.com/panno8m/cloths) (nimble ready)
-* [godot-nim/godotcore](https://github.com/godot-nim/godotcore) (only available on github)
+* [godot-nim/gdextcore](https://github.com/godot-nim/godotcore) (only available on github)
 
 ## Work Progress
 

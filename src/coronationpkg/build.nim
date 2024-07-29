@@ -37,7 +37,7 @@ import std/os
 proc version*(header: JsonHeader): string =
   &"{header.version_major}.{header.version_minor}.{header.version_patch}"
 
-discard layout "godotcore/coronation".root:
+discard layout "gdextcore/coronation".root:
   layout "builtinclasses".dir:
     let corona_constructors = dummy "constructors".nim
   let corona_builtinclasses = dummy "builtinclasses".nim
@@ -45,7 +45,7 @@ discard layout "godotcore/coronation".root:
   let corona_classindex = dummy "classindex".nim
   let corona_classes = dummy "classes".nim
   let corona_utilityfuncs = dummy "utilityfuncs".nim
-discard layout "godotcore/tune".root:
+discard layout "gdextcore/tune".root:
   layout "builtinclasses".dir:
     let tune_constructors = dummy "constructors".nim
   let tune_builtinclasses = dummy "builtinclasses".nim
@@ -175,8 +175,8 @@ srcDir        = "src"
 
 requires "nim >= 2.0.0"
 
-# if missing, please install from https://github.com/godot-nim/godotcore
-requires "godotcore >= 0.1.0"
+# if missing, please install from https://github.com/godot-nim/gdextcore
+requires "gdextcore >= 0.1.0"
 """
 
 
