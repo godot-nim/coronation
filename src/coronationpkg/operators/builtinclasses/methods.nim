@@ -118,7 +118,7 @@ proc weave_methods*(json: JsonBuiltinClass): Cloth =
           weave_procdef entry
 
       weave multiline:
-        &"process eventindex.init_engine.on_load_builtinclassMethod:"
+        &"process staticevents.init_engine.on_load_builtinclassMethod:"
         weave cloths.indent:
           "var proc_name: StringName"
           for entry in requires:
