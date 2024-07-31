@@ -179,7 +179,7 @@ proc weave_native(entry: ClassMethodVirtualEntry): Cloth =
   weave multiline:
     &"proc {entry.name}(p_instance: ClassInstancePtr; p_args: ptr UncheckedArray[ConstTypePtr]; r_ret: TypePtr) {{.gdcall.}} ="
     weave cloths.indent >> Join(delim: ""):
-      &"cast[{entry.self.typesym}](p_instance).{entry.name}("
+      &"errproof: cast[{entry.self.typesym}](p_instance).{entry.name}("
       weave Join(delim: ", "):
         for i, arg in entry.args:
           &"p_args[{i}].decode({arg.type})"
