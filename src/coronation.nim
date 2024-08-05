@@ -6,10 +6,15 @@ import std/osproc
 import std/json
 import std/strformat
 import std/uri
+import std/strutils
+import std/sequtils
 
 import types/json
 
-const version = gorge("git tag")
+const version = staticRead("../coronation.nimble").splitLines
+  .filterIt(it.startsWith "version")[0]
+  .split('=')[1]
+  .strip(chars= {'"', ' '})
 
 proc coronation*(apisource: string; outdir= "out"; package= "gdextgen"; version_control= true) =
   ## Description:
@@ -42,7 +47,7 @@ git tag v{api.header.version}
 
 when isMainModule:
   import cligen
-  clCfg.version= "0.1.0"
+  clCfg.version= version
   coronation.dispatch(
     usage= "$command $args\n\n${doc}\nOptions:\n$options",
     help= {
