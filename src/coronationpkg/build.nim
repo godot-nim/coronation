@@ -9,7 +9,6 @@ import submodules/filesystem/[
   ProjectRoot,
   Directory,
   NimSource,
-  Textfile,
 ]
 import submodules/wordropes
 import submodules/semanticstrings
@@ -160,25 +159,6 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
                 weave_properties class
                 weave_vmap(class)
                 weave_signals(class)
-
-    weave config.package.nimble: &"""
-# Package
-
-version       = "{api.header.version}"
-author        = "coronation written by godot-nim, la.panon."
-description   = "A GDExtension binding"
-license       = "MIT"
-srcDir        = "src"
-
-
-# Dependencies
-
-requires "nim >= 2.0.0"
-
-# if missing, please install from https://github.com/godot-nim/gdextcore
-requires "gdextcore >= 0.1.0"
-"""
-
 
 proc run*(api: JsonAPI; config: BuildConfig) =
 
