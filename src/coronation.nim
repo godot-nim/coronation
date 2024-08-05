@@ -2,8 +2,10 @@ import config
 import build
 
 import std/os
+import std/osproc
 import std/json
 import std/strformat
+import std/uri
 
 import types/json
 
@@ -16,7 +18,14 @@ proc coronation*(apisource: string; outdir= "out"; package= "gdextgen"; version_
   ## Example:
   ##   coronation --apisorce:extension_api.json --outdir:out/godot410 --package:godot
 
-  let api = parseFile(apisource).to(JsonAPI)
+  var apiuri = apisource.parseuri
+  if apiuri.scheme.len == 0:
+    apiuri.scheme = "file"
+    apiuri.path = expandFilename apiuri.path
+
+  echo apiuri
+  echo repr apiuri
+  let api = execCmdEx(&"curl -s {apiuri}").output.parsejson.to(JsonAPI)
 
   build.run api= api, BuildConfig(
     apisource: apisource,
