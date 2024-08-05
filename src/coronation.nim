@@ -16,7 +16,7 @@ const version = staticRead("../coronation.nimble").splitLines
   .split('=')[1]
   .strip(chars= {'"', ' '})
 
-proc coronation*(apisource: string; outdir= "out"; package= "gdextgen"; version_control= true) =
+proc coronation*(apisource: string; outdir= "out"; package= "gdextgen") =
   ## Description:
   ##   Read API spec from `apisource`, generate godot package named `package` into `outdir`.
   ##
@@ -37,13 +37,6 @@ proc coronation*(apisource: string; outdir= "out"; package= "gdextgen"; version_
     outdir: outdir,
     package: package,
   )
-  if version_control: discard execShellCmd &"""
-cd {outdir/package}
-git init
-git add *
-git commit -m "generate from {api.header.version_full_name} by coronation {version}"
-git tag v{api.header.version}
-"""
 
 when isMainModule:
   import cligen
@@ -54,6 +47,5 @@ when isMainModule:
       "apisource": "Path to extension_api.json output by the engine",
       "outdir": "Directory that the generated package will be placed to",
       "package": "Name of generated package",
-      "version-control": "If false, do not execute git init/commit to generated package"
     },
   )
