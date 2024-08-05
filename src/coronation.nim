@@ -27,9 +27,6 @@ proc coronation*(apisource: string; outdir= "out"; package= "gdextgen") =
   if apiuri.scheme.len == 0:
     apiuri.scheme = "file"
     apiuri.path = expandFilename apiuri.path
-
-  echo apiuri
-  echo repr apiuri
   let api = execCmdEx(&"curl -s {apiuri}").output.parsejson.to(JsonAPI)
 
   build.run api= api, BuildConfig(
