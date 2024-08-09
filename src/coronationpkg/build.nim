@@ -69,6 +69,7 @@ proc project(config: BuildConfig; api: JsonAPI): ProjectRoot =
         let globalenums = weave "globalenums".nim:
           weave margin:
             for globalenum in api.global_enums:
+              if globalenum.name == "Variant.Type": continue
               weave with_registerDB globalenum.convert
 
         # [Local Enums]
