@@ -61,6 +61,7 @@ const manualImplemented* = (
     ck"minf(Float Float)",
     ck"clampi(Int Int Int)",
     ck"clampf(Float Float Float)",
+    ck"hash(Variant)",
 
     ck"and(bool Variant)",
     ck"or(bool Variant)",
